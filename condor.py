@@ -1,8 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# last author: Joseph Lucas DYOGEN/IBENS 46 rue d'Ulm PARIS 75005
+# https://github.com/DyogenIBENS/CondorViaPython
+
+# Fork from
 # author:  Adrian Sampson (sampsyo) http://homes.cs.washington.edu/~asampson/
 # Found on https://github.com/sampsyo/clusterfutures
+# There were no licence so owing to:
+#       https://help.github.com/articles/github-terms-of-service/#f
+# """... by setting your pages to be viewed publicly, you agree to allow
+#    others to view your Content. By setting your repositories to be viewed
+#    publicly, you agree to allow others to view and fork your repositories."""
+# we forked its deposit https://github.com/andeElliott/condorPythonShell
 
 """
 Abstracts access to a Condor cluster via its command-line tools.

@@ -35,9 +35,9 @@ LOCAL_BUFF_FOLDER = home + '/condor'
 SCRIPTFILE = "condorpy.%s.jobscript"
 OUTFILE = "condorpy.%s.stdout.log"
 ERRFILE = "condorpy.%s.stderr.log"
-# dyoclust08 is not working
+# dyoclust07-08 are not 100% functional
 MACHINES = ["bioclust%02d.bioclust.biologie.ens.fr" % i for i in range(1, 11)] + \
-           ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 7) + range(9, 22)]
+           ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 6) + range(9, 22)]
 
 
 def call(command, stdin=None):
@@ -325,7 +325,7 @@ if __name__ == '__main__':
     ###################
     ## myCondor.py should be launched in MagSimus root folder for having good links
     listOfJids = []
-    for idxSimu in range(10):
+    for idxSimu in range(500):
        try:
            os.mkdir("res/simu1/%s/" % idxSimu)
        except:

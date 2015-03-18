@@ -228,17 +228,6 @@ def getOutputWithBuffer(jobid, jobName, log=LOG_FILE, cleanup=True):
 
     return stdout, stderr
 
-# if you have pb on your jobs, the directory REMOTE_BUFF_FOLDER won't be clean automatically.
-# this script allows to see what is in REMOTE_BUFF_FOLDER if it exists on all machines
-# examples :
-
-# execBashCmdOnAllMachines('ls', arguments=REMOTE_BUFF_FOLDER)
-
-# completely remove REMOTE_BUFF_FOLDER on all machines
-# execBashCmdOnAllMachines('rm', arguments='-rf ' + REMOTE_BUFF_FOLDER)
-
-# remove specific content of the REMOTE_BUFF_FOLDER on all machines, all files finishing by '.txt'
-# execBashCmdOnAllMachines('rm', arguments='-rf ' + REMOTE_BUFF_FOLDER + '/*.txt')
 def execBashCmdOnAllMachines(command, arguments=None, machines=MACHINES, mail=None, log=LOG_FILE):
     listOfJids = []
     for (i, machine) in enumerate(machines):
@@ -305,9 +294,9 @@ class WaitThread(threading.Thread):
                 time.sleep(self.interval)
 
 if __name__ == '__main__':
-    ###################
-    # Initial example #
-    ###################
+    #################
+    # first example #
+    #################
     # jid = job id (cluster ID of the new job)
     jid1 = submit("/bin/echo", arguments='hello world 1')
     jid2 = submit("/bin/echo", arguments='hello world 2')
@@ -320,10 +309,12 @@ if __name__ == '__main__':
     print stdout
     print "jobs done"
 
-    ###################
-    ## Second example #
-    ###################
-    ## myCondor.py should be launched in MagSimus root folder for having good links
+    ##################
+    # second example #
+    ##################
+    # This example uses a software called src/magSimus1.py but with specific
+    # arguments but it could use any other executable and arguments.
+    # condor.py should be launched in MagSimus root folder for having good links
     listOfJids = []
     for idxSimu in range(500):
        try:
@@ -350,3 +341,15 @@ if __name__ == '__main__':
 
     # look inside the remote temporary folders to verify that temporary files have been removed
     execBashCmdOnAllMachines('ls ' + REMOTE_BUFF_FOLDER)
+
+    # If you have pbs on your jobs, the directory REMOTE_BUFF_FOLDER won't be clean automatically.
+    # this script allows to see what is in REMOTE_BUFF_FOLDER if it exists on all machines
+    # examples :
+
+    # execBashCmdOnAllMachines('ls', arguments=REMOTE_BUFF_FOLDER)
+
+    # completely remove REMOTE_BUFF_FOLDER on all machines
+    # execBashCmdOnAllMachines('rm', arguments='-rf ' + REMOTE_BUFF_FOLDER)
+
+    # remove specific content of the REMOTE_BUFF_FOLDER on all machines, all files finishing by '.txt'
+    # execBashCmdOnAllMachines('rm', arguments='-rf ' + REMOTE_BUFF_FOLDER + '/*.txt')

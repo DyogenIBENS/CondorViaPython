@@ -37,7 +37,7 @@ OUTFILE = "condorpy.%s.stdout.log"
 ERRFILE = "condorpy.%s.stderr.log"
 # dyoclust07-08 are not 100% functional
 MACHINES = ["bioclust%02d.bioclust.biologie.ens.fr" % i for i in range(1, 11)] + \
-           ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 6) + range(9, 22)]
+           ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 7) + range(9, 22)]
 
 
 def call(command, stdin=None):
@@ -102,26 +102,26 @@ def submit(executable, universe="vanilla",
     """Starts a Condor job based on specified parameters. A job
     description is generated. Returns the cluster ID of the new job.
 
-    # examples of options:
-    # 1) requirements:
-    # requirements = (Memory > 1024) && (Machine != "bioclust01.bioclust.biologie.ens.fr") && (slotid <= 6)
-    # (slotid <= 6) means that the job won't occupy more than 6 thread on a multi-core machine.
-    # This option may be interesting if the job uses several threads on a same machine.
-    # For instance Blast uses 4 threads and it would be interesting to send the job with (slotid <= 4) on an octo-core
-    # machine.
-    # 2) priority:
-    # Each job may have a priority level specified by 'priority', an int >= 0.
-    # Condor executes jobs by decreasing priority levels.
-    # If a job1 has a priority1 and job2 has a priority2 and if priority1 > priority2, job1 will be executed before job2
-    # This won't change the priority between two different users, it just changes the order of jobs of a same user.
-    # 3) niceUser:
-    # If the user is planning to send a big amount of jobs that do not take long to execute, he may execute them with
-    # the niceUser option set to True (and no limit of simultaneous runs), thus all other users will have the priority
-    # over him.
-    # 4) maxSimRuns is an upper limit of simultaneous runs on all the machines of the cluster. The user can send an
-    # unlimited amount of jobs that will be queued but no more than 100 jobs will be executed simultaneously.
-    # This limit limit the saturation of cores and keep some cores free for other users.
-    # This option is especially important if jobs take a long time.
+    examples of options:
+    1) requirements:
+    requirements = (Memory > 1024) && (Machine != "bioclust01.bioclust.biologie.ens.fr") && (slotid <= 6)
+    (slotid <= 6) means that the job won't occupy more than 6 thread on a multi-core machine.
+    This option may be interesting if the job uses several threads on a same machine.
+    For instance Blast uses 4 threads and it would be interesting to send the job with (slotid <= 4) on an octo-core
+    machine.
+    2) priority:
+    Each job may have a priority level specified by 'priority', an int >= 0.
+    Condor executes jobs by decreasing priority levels.
+    If a job1 has a priority1 and job2 has a priority2 and if priority1 > priority2, job1 will be executed before job2
+    This won't change the priority between two different users, it just changes the order of jobs of a same user.
+    3) niceUser:
+    If the user is planning to send a big amount of jobs that do not take long to execute, he may execute them with
+    the niceUser option set to True (and no limit of simultaneous runs), thus all other users will have the priority
+    over him.
+    4) maxSimRuns is an upper limit of simultaneous runs on all the machines of the cluster. The user can send an
+    unlimited amount of jobs that will be queued but no more than 100 jobs will be executed simultaneously.
+    This limit limit the saturation of cores and keep some cores free for other users.
+    This option is especially important if jobs take a long time.
     """
 
     outfile = LOCAL_BUFF_FOLDER + '/' + OUTFILE % "$(Cluster)"

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# last author: Joseph Lucas DYOGEN/IBENS 46 rue d'Ulm PARIS 755
+# last author: Joseph Lucas DYOGEN/IBENS 46 rue d'Ulm PARIS 75005
 # https://github.com/DyogenIBENS/CondorViaPython
 
 # Fork from

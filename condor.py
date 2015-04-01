@@ -564,23 +564,28 @@ if __name__ == '__main__':
 
     import timeit
 
-    nbJobs = 20
-    t_example1_noBuff = timeit.timeit("example1_noBuff(%s)" % nbJobs, setup="from __main__ import example1_noBuff", number=1)
-    print >> sys.stderr, "example1_noBuff", t_example1_noBuff
-    t_example1_buff = timeit.timeit("example1_buff(%s)" % nbJobs, setup="from __main__ import example1_buff", number=1)
-    print >> sys.stderr, "example1_buff", t_example1_buff
-    t_example1_thread = timeit.timeit("example1_thread(%s)" % nbJobs, setup="from __main__ import example1_thread", number=1)
-    print >> sys.stderr, "t_example1_thread", t_example1_thread
+    #nbJobs = 20
+    #t_example1_noBuff = timeit.timeit("example1_noBuff(%s)" % nbJobs, setup="from __main__ import example1_noBuff", number=1)
+    #print >> sys.stderr, "example1_noBuff", t_example1_noBuff
+    #t_example1_buff = timeit.timeit("example1_buff(%s)" % nbJobs, setup="from __main__ import example1_buff", number=1)
+    #print >> sys.stderr, "example1_buff", t_example1_buff
+    #t_example1_thread = timeit.timeit("example1_thread(%s)" % nbJobs, setup="from __main__ import example1_thread", number=1)
+    #print >> sys.stderr, "t_example1_thread", t_example1_thread
 
-    print >> sys.stderr, "example1_noBuff", t_example1_noBuff
-    print >> sys.stderr, "example1_buff", t_example1_buff
-    print >> sys.stderr, "t_example1_thread", t_example1_thread
+    #print >> sys.stderr, "example1_noBuff", t_example1_noBuff
+    ## example1_noBuff 28.5351910591
+    #print >> sys.stderr, "example1_buff", t_example1_buff
+    ## example1_buff 46.931251049
+    #print >> sys.stderr, "t_example1_thread", t_example1_thread
+    ## t_example1_thread 12.5498409271
 
-    nbJobs = 20
-    t_example2_buff = timeit.timeit("example2_buff(%s)" % nbJobs, setup="from __main__ import example2_buff", number=1)
-    print >> sys.stderr, "t_example2_buff", t_example2_buff
+    nbJobs = 150
     t_example2_thread = timeit.timeit("example2_thread(%s)" % nbJobs, setup="from __main__ import example2_thread", number=1)
     print >> sys.stderr, "t_example2_thread", t_example2_thread
+    t_example2_buff = timeit.timeit("example2_buff(%s)" % nbJobs, setup="from __main__ import example2_buff", number=1)
+    print >> sys.stderr, "t_example2_buff", t_example2_buff
 
     print >> sys.stderr, "t_example2_buff", t_example2_buff
+    # nbJobs=20 -> t_example2_buff 66.1677789688
     print >> sys.stderr, "t_example2_thread", t_example2_thread
+    # nbJobs=20 -> t_example2_thread 50.775026083

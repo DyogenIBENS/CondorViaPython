@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# last author: Joseph Lucas DYOGEN/IBENS 46 rue d'Ulm PARIS 755
+# last author: Joseph Lucas DYOGEN/IBENS 46 rue d'Ulm PARIS 75005
 # https://github.com/DyogenIBENS/CondorViaPython
 
 # Fork from
@@ -12,7 +12,7 @@
 # """... by setting your pages to be viewed publicly, you agree to allow
 #    others to view your Content. By setting your repositories to be viewed
 #    publicly, you agree to allow others to view and fork your repositories."""
-# we forked its deposit https://github.com/andeElliott/condorPythonShell
+# we forked its deposit https://github.com/DyogenIBENS/CondorViaPython
 
 """
 Abstracts access to a Condor cluster via its command-line tools.

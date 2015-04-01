@@ -32,15 +32,15 @@ import logging
 # Logging messages which are less severe than level will be ignored
 logging.basicConfig(level=logging.DEBUG, format='(%(threadName)-10s) %(message)s')
 
-LOG_FILE = "condorpy.log"
+LOG_FILE = "cdpy.log"
 # local buffer folder
 USER = getpass.getuser()
 REMOTE_BUFF_FOLDER = '/localtmp/' + USER
 home = os.path.expanduser("~")
 LOCAL_BUFF_FOLDER = home + '/condor'
-SCRIPTFILE = "condorpy.%s.jobscript"
-OUTFILE = "condorpy.%s.stdout.log"
-ERRFILE = "condorpy.%s.stderr.log"
+SCRIPTFILE = "copy.%s.jobscript"
+OUTFILE = "copy.%s.stdout.log"
+ERRFILE = "copy.%s.stderr.log"
 # dyoclust07-08 are not 100% functional
 MACHINES = ["bioclust%02d.bioclust.biologie.ens.fr" % i for i in range(1, 11)] + \
            ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 7) + range(9, 22)]
@@ -276,6 +276,10 @@ def getOutputWithBuffer(jobid, jobName, waitMaxTime=None, log=LOG_FILE, cleanup=
     return (outfileName, errfileName)
 
 def execBashCmdOnAllMachines(command, machines=MACHINES, mail=None, log=LOG_FILE):
+    """
+    If you have pbs on your jobs, the directory REMOTE_BUFF_FOLDER won't be clean automatically.
+    this script allows to remove all files in REMOTE_BUFF_FOLDER on all machines
+    """
     listOfJids = []
     for (i, machine) in enumerate(machines):
         jobName = str(i)
@@ -421,7 +425,7 @@ if __name__ == '__main__':
     ##################
     #  first example #
     ##################
-    def example1_noBuff(nbJobs):
+    def helloWorld_noBuff(nbJobs):
         listOfJNamesIds = []
         for jobName in range(nbJobs):
             # jid = job id (cluster ID of the new job)
@@ -439,7 +443,7 @@ if __name__ == '__main__':
             os.unlink(stderrFileName)
         print "jobs done"
 
-    def example1_buff(nbJobs):
+    def helloWorld_buff(nbJobs):
         # Same with buffer
         listOfJNamesIds = []
         for jobName in range(nbJobs):
@@ -457,7 +461,7 @@ if __name__ == '__main__':
             os.unlink(stderrFileName)
         print "jobs done"
 
-    def example1_thread(nbJobs):
+    def helloWorld_thread(nbJobs):
         # Same with threads
         verbose = True
         listOfThreads = []
@@ -479,7 +483,7 @@ if __name__ == '__main__':
     # ##################
     # # second example #
     # ##################
-    def example2_buff(nbJobs):
+    def magSimus_buff(nbJobs):
         # This example uses a software called src/magSimus1.py but with specific
         # arguments but it could use any other executable and arguments.
         # condor.py should be launched in MagSimus root folder for having good links
@@ -511,7 +515,7 @@ if __name__ == '__main__':
             os.unlink(stdoutFileName)
             os.unlink(stderrFileName)
 
-    def example2_thread(nbJobs):
+    def magSimus_thread(nbJobs):
         # Same with threads
         listOfThreads = []
         for idxSimu in range(nbJobs):
@@ -553,39 +557,98 @@ if __name__ == '__main__':
         # echo 'toto
         execBashCmdOnAllMachines('echo "toto"')
 
+        # create a file toto in remote folders
         execBashCmdOnAllMachines('touch ' + REMOTE_BUFF_FOLDER + '/toto')
-        # look inside the remote temporary folders to verify that temporary files have been removed
+        # look inside the remote temporary folders
+        # To check if all temporary files have been removed properly
         execBashCmdOnAllMachines('ls ' + REMOTE_BUFF_FOLDER)
 
-        # completely remove REMOTE_BUFF_FOLDER on all machines
-        # If you have pbs on your jobs, the directory REMOTE_BUFF_FOLDER won't be clean automatically.
-        # this script allows to remove all files in REMOTE_BUFF_FOLDER on all machines
+        # remove all files in remote folders
         execBashCmdOnAllMachines('rm ' + REMOTE_BUFF_FOLDER + '/*')
+
+    def fibs_Sequential(nbJobs):
+        def fib(n):
+            if n < 2:
+                return n
+            return fib(n-2) + fib(n-1)
+
+        for n in range(nbJobs):
+            print "job%s: fib(35) = %s" % (n, fib(35))
+
+    def fibs_withThreads(nbJobs):
+
+        def createFib35Script():
+            code =\
+            ("#!/usr/bin/python\n"
+             "def fib(n):\n"
+             "    if n < 2:\n"
+             "        return n\n"
+             "    return fib(n-2) + fib(n-1)\n"
+             "print 'fib(35) =', fib(35)"
+             )
+            filename = './fib35.py'
+            try:
+                os.unlink(filename)
+            except:
+                pass
+            with open(filename, 'w+') as f:
+                print >> f, code
+            os.chmod(filename, 0755)
+
+        listOfThreads = []
+        createFib35Script()
+        for n in range(nbJobs):
+           jobName = 'fib' + str(n)
+           command = 'python ./fib35.py'
+           t = condorThread(command=command, name=jobName, verbose=False)
+           t.start()
+           assert t.tName == jobName
+           listOfThreads.append((t, jobName))
+
+        for (t, jobName) in listOfThreads:
+            t.join()
+            stdoutFileName, stderrFileName = t.res
+            print >> sys.stdout, jobName + ':',
+            printFileIntoStream(stdoutFileName, sys.stdout)
+            # remove files
+            os.unlink(stdoutFileName)
+            os.unlink(stderrFileName)
+            del t
+
 
     import timeit
 
     #nbJobs = 20
-    #t_example1_noBuff = timeit.timeit("example1_noBuff(%s)" % nbJobs, setup="from __main__ import example1_noBuff", number=1)
-    #print >> sys.stderr, "example1_noBuff", t_example1_noBuff
-    #t_example1_buff = timeit.timeit("example1_buff(%s)" % nbJobs, setup="from __main__ import example1_buff", number=1)
-    #print >> sys.stderr, "example1_buff", t_example1_buff
-    #t_example1_thread = timeit.timeit("example1_thread(%s)" % nbJobs, setup="from __main__ import example1_thread", number=1)
-    #print >> sys.stderr, "t_example1_thread", t_example1_thread
+    #t_helloWorld_noBuff = timeit.timeit("helloWorld_noBuff(%s)" % nbJobs, setup="from __main__ import helloWorld_noBuff", number=1)
+    #print >> sys.stderr, "helloWorld_noBuff", t_helloWorld_noBuff
+    #t_helloWorld_buff = timeit.timeit("helloWorld_buff(%s)" % nbJobs, setup="from __main__ import helloWorld_buff", number=1)
+    #print >> sys.stderr, "helloWorld_buff", t_helloWorld_buff
+    #t_helloWorld_thread = timeit.timeit("helloWorld_thread(%s)" % nbJobs, setup="from __main__ import helloWorld_thread", number=1)
+    #print >> sys.stderr, "t_helloWorld_thread", t_helloWorld_thread
 
-    #print >> sys.stderr, "example1_noBuff", t_example1_noBuff
-    ## example1_noBuff 28.5351910591
-    #print >> sys.stderr, "example1_buff", t_example1_buff
-    ## example1_buff 46.931251049
-    #print >> sys.stderr, "t_example1_thread", t_example1_thread
-    ## t_example1_thread 12.5498409271
+    #print >> sys.stderr, "helloWorld_noBuff", t_helloWorld_noBuff
+    ## helloWorld_noBuff 28.5351910591
+    #print >> sys.stderr, "helloWorld_buff", t_helloWorld_buff
+    ## helloWorld_buff 46.931251049
+    #print >> sys.stderr, "t_helloWorld_thread", t_helloWorld_thread
+    ## t_helloWorld_thread 12.5498409271
 
-    nbJobs = 150
-    t_example2_thread = timeit.timeit("example2_thread(%s)" % nbJobs, setup="from __main__ import example2_thread", number=1)
-    print >> sys.stderr, "t_example2_thread", t_example2_thread
-    t_example2_buff = timeit.timeit("example2_buff(%s)" % nbJobs, setup="from __main__ import example2_buff", number=1)
-    print >> sys.stderr, "t_example2_buff", t_example2_buff
+    # nbJobs = 150
+    # t_magSimus_thread = timeit.timeit("magSimus_thread(%s)" % nbJobs, setup="from __main__ import magSimus_thread", number=1)
+    # print >> sys.stderr, "t_magSimus_thread", t_magSimus_thread
+    # t_magSimus_buff = timeit.timeit("magSimus_buff(%s)" % nbJobs, setup="from __main__ import magSimus_buff", number=1)
+    # print >> sys.stderr, "t_magSimus_buff", t_magSimus_buff
+    #
+    # print >> sys.stderr, "t_magSimus_buff", t_magSimus_buff
+    # # nbJobs=20 -> t_magSimus_buff 66.1677789688
+    # print >> sys.stderr, "t_magSimus_thread", t_magSimus_thread
+    # # nbJobs=20 -> t_magSimus_thread 50.775026083
 
-    print >> sys.stderr, "t_example2_buff", t_example2_buff
-    # nbJobs=20 -> t_example2_buff 66.1677789688
-    print >> sys.stderr, "t_example2_thread", t_example2_thread
-    # nbJobs=20 -> t_example2_thread 50.775026083
+    nbJobs = 
+    print >> sys.stderr, "Sequential execution:"
+    t_fibs = timeit.timeit("fibs_Sequential(%s)" % nbJobs, setup="from __main__ import fibs_Sequential", number=1)
+    print >> sys.stderr, "Condor execution:"
+    fibs_withThreads = timeit.timeit("fibs_withThreads(%s)" % nbJobs, setup="from __main__ import fibs_withThreads", number=1)
+
+    print >> sys.stderr, "fibs_Sequential", t_fibs
+    print >> sys.stderr, "fibs_withThreads", fibs_withThreads

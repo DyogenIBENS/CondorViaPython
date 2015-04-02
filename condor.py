@@ -591,14 +591,14 @@ if __name__ == '__main__':
                 os.unlink(filename)
             except:
                 pass
-            with open(filename, 'w+') as f:
+            with open(filename, 'w') as f:
                 print >> f, code
             os.chmod(filename, 0755)
 
         listOfThreads = []
         createFib35Script()
         for n in range(nbJobs):
-           jobName = 'fib' + str(n)
+           jobName = 'fib35_' + str(n)
            command = 'python ./fib35.py'
            t = condorThread(command=command, name=jobName, verbose=False)
            t.start()

@@ -566,7 +566,7 @@ if __name__ == '__main__':
         # remove all files in remote folders
         execBashCmdOnAllMachines('rm ' + REMOTE_BUFF_FOLDER + '/*')
 
-    def fibs_Sequential(nbJobs):
+    def fibs_localSequential(nbJobs):
         def fib(n):
             if n < 2:
                 return n
@@ -575,7 +575,7 @@ if __name__ == '__main__':
         for n in range(nbJobs):
             print "job%s: fib(35) = %s" % (n, fib(35))
 
-    def fibs_withThreads(nbJobs):
+    def fibs_condorThreads(nbJobs):
 
         def createFib35Script():
             code =\
@@ -613,6 +613,10 @@ if __name__ == '__main__':
             # remove files
             os.unlink(stdoutFileName)
             os.unlink(stderrFileName)
+            try:
+                os.unlink('./fib35.py')
+            except:
+                pass
             del t
 
 
@@ -644,11 +648,11 @@ if __name__ == '__main__':
     # print >> sys.stderr, "t_magSimus_thread", t_magSimus_thread
     # # nbJobs=20 -> t_magSimus_thread 50.775026083
 
-    nbJobs = 
-    print >> sys.stderr, "Sequential execution:"
-    t_fibs = timeit.timeit("fibs_Sequential(%s)" % nbJobs, setup="from __main__ import fibs_Sequential", number=1)
-    print >> sys.stderr, "Condor execution:"
-    fibs_withThreads = timeit.timeit("fibs_withThreads(%s)" % nbJobs, setup="from __main__ import fibs_withThreads", number=1)
+    nbJobs = 6
+    print >> sys.stderr, "Local sequential execution:"
+    t_fibs = timeit.timeit("fibs_localSequential(%s)" % nbJobs, setup="from __main__ import fibs_localSequential", number=1)
+    print >> sys.stderr, "Condor parallel execution:"
+    fibs_withThreads = timeit.timeit("fibs_condorThreads(%s)" % nbJobs, setup="from __main__ import fibs_condorThreads", number=1)
 
-    print >> sys.stderr, "fibs_Sequential", t_fibs
-    print >> sys.stderr, "fibs_withThreads", fibs_withThreads
+    print >> sys.stderr, "fibs_localSequential", t_fibs
+    print >> sys.stderr, "fibs_condorThreads", fibs_withThreads

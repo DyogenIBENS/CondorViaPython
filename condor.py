@@ -41,9 +41,8 @@ LOCAL_BUFF_FOLDER = home + '/condor'
 SCRIPTFILE = "conpy.%s.jobscript"
 OUTFILE = "conpy.%s.stdout.log"
 ERRFILE = "conpy.%s.stderr.log"
-# dyoclust07-08 are not 100% functional
 MACHINES = ["bioclust%02d.bioclust.biologie.ens.fr" % i for i in range(1, 11)] + \
-           ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 7) + range(9, 22)]
+           ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 22)]
 
 
 # TODO: write a method that send jobs via a synthetic COND file with the executable and all info on the top and the

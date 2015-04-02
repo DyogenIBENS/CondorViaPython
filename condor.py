@@ -38,9 +38,9 @@ USER = getpass.getuser()
 REMOTE_BUFF_FOLDER = '/localtmp/' + USER
 home = os.path.expanduser("~")
 LOCAL_BUFF_FOLDER = home + '/condor'
-SCRIPTFILE = "copy.%s.jobscript"
-OUTFILE = "copy.%s.stdout.log"
-ERRFILE = "copy.%s.stderr.log"
+SCRIPTFILE = "conpy.%s.jobscript"
+OUTFILE = "conpy.%s.stdout.log"
+ERRFILE = "conpy.%s.stderr.log"
 # dyoclust07-08 are not 100% functional
 MACHINES = ["bioclust%02d.bioclust.biologie.ens.fr" % i for i in range(1, 11)] + \
            ["dyoclust%02d.bioclust.biologie.ens.fr" % i for i in range(4, 7) + range(9, 22)]

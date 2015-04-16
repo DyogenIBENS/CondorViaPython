@@ -28,7 +28,7 @@ import distutils.spawn
 import sys
 # import logging
 from multiprocessing.dummy import Pool
-
+from utils import myTools
 
 # Logging messages which are less severe than level will be ignored
 # logging.basicConfig(level=logging.DEBUG, format='(%(threadName)-10s) %(message)s')
@@ -323,6 +323,10 @@ def submit_COND_ManyJobs(COND):
     print >> sys.stderr, "submission finished"
     # list [..., (clusterId, jid), ...]
     listOfJobids = re.findall(r'Proc (\d+\.\d+)', out)
+    for (jobid1, jobid2) in myTools.myIterator.slidingTuple(listOfJobids):
+        assert isinstance(jobid1, str) and isinstance(jobid2, str)
+        assert jobid1.split('.')[0] == jobid2.split('.')[0]
+        assert int(jobid1.split('.')[1]) == int(jobid2.split('.')[1]) - 1
     return listOfJobids
 
 
@@ -428,7 +432,7 @@ def waitUntilLogOutExists(jobid, waitTime=2):
             return jobid
         time.sleep(waitTime)
 
-def getoutput_ManyJobs(listOfJobids, waitTime=2, log=LOG_FILE, cleanup=True):
+def getoutput_ManyJobs(listOfJobids):
     """Waits for a job to complete and then returns its standard output
     and standard error data if the files were given default names.
     Deletes these files after reading them if ``cleanup`` is True.
@@ -731,7 +735,7 @@ if __name__ == '__main__':
                        ' -parameterFile=data/parameters.v80 -userRatesFile=data/specRates_MS1.v80 +lazyBreakpointAnalyzer'
            listOfArguments.append(arguments)
         listOfJids = submit_ManyJobs(executable, listOfArguments, niceUser=True, maxSimultaneousJobsInGroup=None)
-        for (jobid, stderrFileName, stdoutFileName) in getoutput_ManyJobs(listOfJids):
+        for (jobid, stdoutFileName, stderrFileName) in getoutput_ManyJobs(listOfJids):
             # print the 3 first lines of stdout and stderr logs
             with open(stdoutFileName, 'r') as f:
                 print >> sys.stdout, f.readline(),
@@ -852,15 +856,19 @@ if __name__ == '__main__':
     #print >> sys.stderr, "t_helloWorld_thread", t_helloWorld_thread
     ## t_helloWorld_thread 12.5498409271
 
-    nbJobs = 1000
-    #nbJobs = 200
+    # over 3000 i get this error:
+    #__main__.CommandError: 'condor_submit -v' exited with status 1: '\nWARNING: your Requirements expression refers to TARGET.Memory. This is obsolete. Set request_memory and condor_submit will modify the Requirements expression as needed.\n\nERROR: Failed submission for job 30670.2085 - aborting entire submit\n\nERROR: Failed to queue
+    #nbJobs = 3000
+    nbJobs = 200
     # t_magSimus_thread = timeit.timeit("magSimus_thread(%s)" % nbJobs, setup="from __main__ import magSimus_thread", number=1)
     # print >> sys.stderr, "t_magSimus_thread", t_magSimus_thread
     #t_magSimus_buff = timeit.timeit("magSimus_buff(%s)" % nbJobs, setup="from __main__ import magSimus_buff", number=1)
     #print >> sys.stderr, "t_magSimus_buff", t_magSimus_buff
     t_magSimus_ManyJobs = timeit.timeit("magSimus_ManyJobs(%s)" % nbJobs, setup="from __main__ import magSimus_ManyJobs", number=1)
     print >> sys.stderr, "t_magSimus_ManyJobs", t_magSimus_ManyJobs
+    # nbJobs = 200 -> t_magSimus_ManyJobs 60 secs !
     # nbJobs = 1000 -> t_magSimus_ManyJobs 155 secs !
+    # nbJobs = 3000 -> t_magSimus_ManyJobs 478 secs !
 
     # print >> sys.stderr, "t_magSimus_buff", t_magSimus_buff
     # nbJobs=20 -> t_magSimus_buff 66.1677789688
